@@ -6,9 +6,8 @@
     "toolbar": false,
     "width": 800,
     "height": 600
-  }
-  ,
-  "scripts": { 
-      "start": "nodewebkit ."
+  },
+  "scripts": {
+    "start": "nodewebkit ."
   }
 }

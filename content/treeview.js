@@ -1,6 +1,6 @@
 var myApp = angular.module('myApp', []);
 
-var fnMainCtrl = function($scope) {
+var MainCtrl = function ($scope) {
     $scope.data = {
         text: 'Root',
         items: [{
@@ -9,14 +9,14 @@ var fnMainCtrl = function($scope) {
                 {
                     text: 'Subfolder1',
                     items: []
-                }, 
+                },
                 {
                     text: 'Subfolder2',
                     items: [
                         {
                             text: 'Subsubfolder1',
                             items: []
-                        },  
+                        },
                         {
                             text: 'Subsubfolder2',
                             items: []
@@ -24,30 +24,30 @@ var fnMainCtrl = function($scope) {
                     ]
                 }
             ]
-        }, 
-        {
-            text: 'Folder2',
-            items: []
-        }]
+        },
+            {
+                text: 'Folder2',
+                items: []
+            }]
     };
 }
 
-var fnTreeDirective = function($compile, $templateCache) {
+var TreeDirective = function ($compile, $templateCache) {
     return {
         restrict: 'E',
         scope: false,
-        link: function(scope, el, attrs) {
+        link: function (scope, el, attrs) {
 
             var self = this;
-            
+
             this.dataPath = attrs.val;
             this.data = scope.$eval(this.dataPath);
 
-            scope.addMember = function(path) {
+            scope.addMember = function (path) {
                 var item = scope.browse(path);
 
                 var newMember = ""; // Get newMember from path's input
-                if(path === "")
+                if (path === "")
                     newMember = angular.element(document.querySelector("tree > input")).val();
                 else
                     newMember = angular.element(document.querySelector("[data-path='" + path + "'] > input")).val();
@@ -58,13 +58,13 @@ var fnTreeDirective = function($compile, $templateCache) {
                 });
             }
 
-            scope.deleteSubtree = function(path) {
+            scope.deleteSubtree = function (path) {
                 var item = scope.browse(path);
 
                 if (path !== "") { // Is not root
                     // Build parent path
                     var nPath = path.split("/");
-                    if(nPath.length > 0)
+                    if (nPath.length > 0)
                         nPath = nPath.slice(0, nPath.length - 1);
 
                     nPath = nPath.join("/");
@@ -73,9 +73,9 @@ var fnTreeDirective = function($compile, $templateCache) {
 
                     // Get old index
                     var i = parent.items.indexOf(item);
-                    
+
                     // Copy items to parent
-                    item.items.forEach(function(item) {
+                    item.items.forEach(function (item) {
                         parent.items.splice(i, 0, angular.copy(item));
                         i++;
                     });
@@ -97,13 +97,13 @@ var fnTreeDirective = function($compile, $templateCache) {
                                     </ul>';
 
             // Return data object reference based on path
-            scope.browse = function(path) {
+            scope.browse = function (path) {
                 var nPath = new String(path); // Copy String
-                
-                if(nPath.substr(0, 1) == "/")
+
+                if (nPath.substr(0, 1) == "/")
                     nPath = nPath.slice(1, nPath.length);
 
-                if(nPath == "") {
+                if (nPath == "") {
                     return self.data;
                 }
 
@@ -112,12 +112,12 @@ var fnTreeDirective = function($compile, $templateCache) {
                 return eval(nPath);
             }
 
-            scope.buildRecursive = function(path, element) {
+            scope.buildRecursive = function (path, element) { //
                 // Compile and append folder as content
                 var template = folderTemplate.replace(/{path}/g, path);
                 var isChild = path !== "";
 
-                if(isChild)
+                if (isChild)
                     template = "<li data-path=\"" + path + "\">" + template + "</li>";
 
                 // Append compiled template to element
@@ -126,27 +126,27 @@ var fnTreeDirective = function($compile, $templateCache) {
                 // Check if path has subfolders
                 var item = scope.browse(path);
                 var $ = angular.element; // Alias to angular's jqLite
-                if(item.items.length > 0) {
-                    item.items.forEach(function(subitem, index) {
+                if (item.items.length > 0) {
+                    item.items.forEach(function (subitem, index) {
                         var parent = isChild ? $(document.querySelector("[data-path='" + path + "'] > ul")) : $(element.find("ul")[0]);
 
                         scope.buildRecursive(path + "/" + index, parent);
                     });
                 }
             }
-            
-            // Build DOM tree based on "data" structure
-            scope.buildTree = function() {
+
+            // Build DOM tree based on the structure
+            scope.buildTree = function () {
                 el.html("");
 
                 scope.buildRecursive("", el);
             }
 
-            // Rebuild DOM tree whenever "data" changes
+            // Rebuild DOM tree whenever data changes
             scope.$watch(this.dataPath, scope.buildTree, true);
         }
     }
 }
 
-myApp.controller('MainCtrl', fnMainCtrl)
-     .directive('tree', fnTreeDirective);
+myApp.controller('MainCtrl', MainCtrl)
+    .directive('tree', TreeDirective);
