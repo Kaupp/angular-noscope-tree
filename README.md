@@ -1,2 +1,3 @@
 # angular-noscope-tree
-Angularjs treeview app without using isolated scope because the boss didn't want me to
+Angularjs tree app without using isolated scope because the boss didn't want me to
+Done during my internship at Codequarters.
