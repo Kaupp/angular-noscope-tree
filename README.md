@@ -4,5 +4,6 @@ Done during my internship at Codequarters.
 
 To use run following commands:
 
-npm install 
+npm install
+
 npm start
